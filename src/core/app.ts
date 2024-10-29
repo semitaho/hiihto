@@ -1,9 +1,12 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, Vector3, HemisphericLight, Mesh, MeshBuilder } from "@babylonjs/core";
+import { Engine, Scene, Vector3, HemisphericLight, Mesh, MeshBuilder, SpotLight, Color3 } from "@babylonjs/core";
 import { HiihtoTerrain } from "../components/hiihto.terrain";
 import { HiihtoCamera } from "../components/hiihto.camera";
+import { HiihtoTrack } from "../components/hiihto.track";
+import { PlayerMesh } from "../components/player.mesh";
+import { HiihtoLights } from "../components/hiihto.lights";
 class App {
     constructor() {
         // create the canvas html element and attach it to the webpage
@@ -16,11 +19,16 @@ class App {
         // initialize babylon scene and engine
         var engine = new Engine(canvas, true);
         var scene = new Scene(engine);
+        new HiihtoLights(scene);
 
-        var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(1, 2.5, 2), scene);
-        new HiihtoCamera(canvas, scene);
+           const camera =  new HiihtoCamera(canvas, scene);
 
-        new HiihtoTerrain(scene);
+        const terrain = new HiihtoTerrain(scene);
+        const track = new HiihtoTrack(scene, terrain);
+        const mesh = new PlayerMesh(scene, track);
+
+        camera.setCameraTarget(mesh);
+
         //var sphere: Mesh = MeshBuilder.CreateSphere("sphere", { diameter: 1 }, scene);
 
         // hide/show the Inspector
@@ -34,6 +42,7 @@ class App {
                 }
             }
         });
+
 
         // run the main render loop
         engine.runRenderLoop(() => {

@@ -24,7 +24,7 @@ export class HiihtoTerrain {
         // loop on width points
         const x = (w - mapSubX * 0.5) * 5.0; // distance inter-points = 5 on the width
         const z = (l - mapSubZ * 0.5) * 2.0; // distance inter-points = 2 on the depth
-        const y =  w / (l +1) * Math.sin(l / 2) * Math.cos(w / 2) * 1.0;
+        const y =  w / (l +1) * Math.sin(l / 2) * Math.cos(w / 2) * 0.5;
 
         mapData[3 * (l * mapSubX + w)] = x;
         mapData[3 * (l * mapSubX + w) + 1] = y;
