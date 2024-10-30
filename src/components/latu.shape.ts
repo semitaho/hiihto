@@ -2,26 +2,19 @@ import { Mesh, MeshBuilder, Scene, Vector, Vector3 } from "@babylonjs/core";
 
 export class LatuShape {
   private shape: Vector3[];
-  constructor(width: number) {
-    const startVector = new Vector3(width, -0.4, 0);
+  constructor(offsetVector: Vector3) {
 
     this.shape = [
-    //  new Vector3(-width, 0, 0),
-    //  new Vector3(width, 0, 0),
-     // startVector,
-      ...(this.createLatuura(width, 3).map((singleVector) =>
-        startVector.add(singleVector)
-      )),
-    //  new Vector3(-width, 3, 0),
-      // new Vector3(-width, 0, 0)
+      ...(this.createLatuura().map((singleVector) =>
+        offsetVector.add(singleVector)
+      ))
     ];
 
-    console.log('shapre', this.shape);
   }
 
-  private createLatuura(width: number, latuHeight: number): Vector3[] {
-    const uraHeight = 0.4;
-    const uranleveys = 0.5;
+  private createLatuura(): Vector3[] {
+    const uraHeight = 0.3;
+    const uranleveys = 0.4;
     return [
       new Vector3(0, 0, 0),
       new Vector3(0, uraHeight, 0),

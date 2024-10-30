@@ -1,7 +1,7 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, Vector3, HemisphericLight, Mesh, MeshBuilder, SpotLight, Color3 } from "@babylonjs/core";
+import { Engine, Scene, Vector3, HemisphericLight, Mesh, MeshBuilder, SpotLight, Color3, Quaternion } from "@babylonjs/core";
 import { HiihtoTerrain } from "../components/hiihto.terrain";
 import { HiihtoCamera } from "../components/hiihto.camera";
 import { HiihtoTrack } from "../components/hiihto.track";
@@ -25,9 +25,9 @@ class App {
 
         const terrain = new HiihtoTerrain(scene);
         const track = new HiihtoTrack(scene, terrain);
-        const mesh = new PlayerMesh(scene, track);
+        const player = new PlayerMesh(scene, track);
 
-        camera.setCameraTarget(mesh);
+        camera.setCameraTarget(player);
 
         //var sphere: Mesh = MeshBuilder.CreateSphere("sphere", { diameter: 1 }, scene);
 
@@ -43,6 +43,39 @@ class App {
             }
         });
 
+
+        const points = track.getPoints();
+        console.log('points', points);
+
+        player.setLocation(points[0]);
+        var currentIndex = 0;
+        scene.registerBeforeRender(() => {
+            if (currentIndex < points.length - 1) {
+                const deltaTimeMs = engine.getDeltaTime() / 1000;
+                var nextLoc = points[currentIndex+1];
+                const direction = nextLoc.subtract(player.currentLoc).normalize();
+
+                const speed = deltaTimeMs * 10;
+                const rotSpeed = deltaTimeMs * 10;
+
+
+                var dist = Vector3.Distance(nextLoc,  player.currentLoc);
+               console.log("dist: "+dist+", direction", currentIndex);
+                if (dist < 1) {
+                    currentIndex += 1;
+                    if (currentIndex + 1 >= points.length) {
+                        currentIndex = 0;
+                    }
+                }
+                player.lookAtDirection(direction, rotSpeed);
+
+                player.moveTo(direction, speed);
+
+            }
+          
+
+
+        });
 
         // run the main render loop
         engine.runRenderLoop(() => {
