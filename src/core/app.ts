@@ -60,7 +60,7 @@ class App {
     });
 
     const points = track.getPoints();
-    player.setLocation(points[0]);
+    player.setLocation(new Vector3(points[0].x, points[0].y, points[0].z));
     var currentIndex = 0;
     scene.registerBeforeRender(() => {
       if (currentIndex < points.length - 1) {
