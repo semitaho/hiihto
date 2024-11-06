@@ -3,7 +3,6 @@ import { DynamicTerrain } from "../external/babylon.dynamic-terrain";
 
 export class HiihtoTerrain {
   constructor(scene: Scene) {
-    console.log("aijaa");
     const mapSubX = 1000; // map number of points on the width
     const mapSubZ = 800;
     const terrainSub = 100; // 100 terrain subdivisions

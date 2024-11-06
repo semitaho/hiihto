@@ -5,7 +5,7 @@ import {
   Scene,
   Vector3,
 } from "@babylonjs/core";
-import { HiihtoTrack } from "./hiihto.track";
+import { HiihtoTrack } from "./track/hiihto.track";
 import { PlayerMesh } from "./player.mesh";
 
 export class HiihtoCamera {

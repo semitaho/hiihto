@@ -1,86 +1,125 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, Vector3, HemisphericLight, Mesh, MeshBuilder, SpotLight, Color3, Quaternion } from "@babylonjs/core";
+import {
+  Engine,
+  Scene,
+  Vector3,
+  HemisphericLight,
+  Mesh,
+  MeshBuilder,
+  SpotLight,
+  Color3,
+  Quaternion,
+  StandardMaterial,
+} from "@babylonjs/core";
 import { HiihtoTerrain } from "../components/hiihto.terrain";
 import { HiihtoCamera } from "../components/hiihto.camera";
-import { HiihtoTrack } from "../components/hiihto.track";
+import { HiihtoTrack } from "../components/track/hiihto.track";
 import { PlayerMesh } from "../components/player.mesh";
 import { HiihtoLights } from "../components/hiihto.lights";
 class App {
-    constructor() {
-        // create the canvas html element and attach it to the webpage
-        var canvas = document.createElement("canvas");
-        canvas.style.width = "100%";
-        canvas.style.height = "100%";
-        canvas.id = "gameCanvas";
-        document.body.appendChild(canvas);
+  constructor() {
+    // create the canvas html element and attach it to the webpage
+    var canvas = document.createElement("canvas");
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    canvas.id = "gameCanvas";
+    document.body.appendChild(canvas);
 
-        // initialize babylon scene and engine
-        var engine = new Engine(canvas, true);
-        var scene = new Scene(engine);
-        new HiihtoLights(scene);
+    // initialize babylon scene and engine
+    var engine = new Engine(canvas, true);
+    var scene = new Scene(engine);
+    new HiihtoLights(scene);
 
-           const camera =  new HiihtoCamera(canvas, scene);
+    const camera = new HiihtoCamera(canvas, scene);
 
-        const terrain = new HiihtoTerrain(scene);
-        const track = new HiihtoTrack(scene, terrain);
-        const player = new PlayerMesh(scene, track);
+    const terrain = new HiihtoTerrain(scene);
+    const moveVector1 = new Vector3(50, 1, 0);
+    const moveVector2 = new Vector3(55, 1, 3);
 
-        camera.setCameraTarget(player);
+    const track = new HiihtoTrack(scene, terrain, moveVector1);
+   // const track2 = new HiihtoTrack(scene, terrain, moveVector2);
 
-        //var sphere: Mesh = MeshBuilder.CreateSphere("sphere", { diameter: 1 }, scene);
+    const player = new PlayerMesh(scene, track);
 
-        // hide/show the Inspector
-        window.addEventListener("keydown", (ev) => {
-            // Shift+Ctrl+Alt+I
-            if (ev.ctrlKey) {
-                if (scene.debugLayer.isVisible()) {
-                    scene.debugLayer.hide();
-                } else {
-                    scene.debugLayer.show();
-                }
-            }
-        });
+    camera.setCameraTarget(player);
 
+    //var sphere: Mesh = MeshBuilder.CreateSphere("sphere", { diameter: 1 }, scene);
 
-        const points = track.getPoints();
-        console.log('points', points);
+    // hide/show the Inspector
+    window.addEventListener("keydown", (ev) => {
+      // Shift+Ctrl+Alt+I
+      if (ev.ctrlKey) {
+        if (scene.debugLayer.isVisible()) {
+          scene.debugLayer.hide();
+        } else {
+          scene.debugLayer.show();
+        }
+      }
+    });
 
-        player.setLocation(points[0]);
-        var currentIndex = 0;
-        scene.registerBeforeRender(() => {
-            if (currentIndex < points.length - 1) {
-                const deltaTimeMs = engine.getDeltaTime() / 1000;
-                var nextLoc = points[currentIndex+1];
-                const direction = nextLoc.subtract(player.currentLoc).normalize();
+    const points = track.getPoints();
+    player.setLocation(points[0]);
+    var currentIndex = 0;
+    scene.registerBeforeRender(() => {
+      if (currentIndex < points.length - 1) {
+        const deltaTimeMs = engine.getDeltaTime() / 1000;
+        const nextLoc = points[currentIndex + 1];
+        const speed = deltaTimeMs * 10;
+        const rotSpeed = deltaTimeMs * 50;
+        const dist = Vector3.Distance(nextLoc, player.currentLoc);
+        if (dist < 1) {
+          currentIndex += 1;
+          if (currentIndex + 1 >= points.length) {
+            currentIndex = 0;
+          }
+        }
+        player.lookAtDirection(nextLoc, rotSpeed);
+        player.moveTo(speed);
+      }
+    });
 
-                const speed = deltaTimeMs * 10;
-                const rotSpeed = deltaTimeMs * 10;
+    // run the main render loop
+    engine.runRenderLoop(() => {
+      scene.render();
+    });
+  }
+  drawDebugWaypoints(scene: Scene, points: Vector3[]) {
+    const size = 0.6;
 
+    const material = new StandardMaterial("waypointMat", scene);
+    material.diffuseColor = Color3.Red();
+    points.forEach((position) => {
+      const waypoint = MeshBuilder.CreateSphere(
+        "waypoint",
+        { diameter: size },
+        scene
+      );
+      waypoint.position = position;
+      waypoint.material = material;
+    });
+  }
 
-                var dist = Vector3.Distance(nextLoc,  player.currentLoc);
-               console.log("dist: "+dist+", direction", currentIndex);
-                if (dist < 1) {
-                    currentIndex += 1;
-                    if (currentIndex + 1 >= points.length) {
-                        currentIndex = 0;
-                    }
-                }
-                player.lookAtDirection(direction, rotSpeed);
+  drawPlayerForwardVector(scene: Scene, player: PlayerMesh) {
+    // Apply the player's rotation to the forward vector
+   
 
-                player.moveTo(direction, speed);
+    // Define the end point by scaling the direction vector (e.g., 5 units ahead)
+    const endPoint =  player.currentLoc.add(player.getWorldDirection().scale(5));
 
-            }
-          
+    // Draw the line from the player's position to the end point
+    const line = MeshBuilder.CreateLines(
+      "forwardLine",
+      {
+        points: [player.currentLoc.add(Vector3.Up().scale(0.5)), endPoint.add(Vector3.Up().scale(0.5))],
+        updatable: true, // Make it updatable if the player moves
+      },
+      scene
+    );
 
-
-        });
-
-        // run the main render loop
-        engine.runRenderLoop(() => {
-            scene.render();
-        });
-    }
+    // Optional: Set line color for better visibility
+    line.color = new Color3(1, 0, 0); // Red color
+  }
 }
 new App();
