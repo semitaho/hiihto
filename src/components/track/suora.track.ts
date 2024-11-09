@@ -14,33 +14,56 @@ export class SuoraTrack implements ShapeTrack {
       new Vector3(0, 0, 3),
       new Vector3(0, 0, 4),
     ];
+    let changeVector = [];
     switch (this.orientation) {
       case OrientationShape.OPPOSITE:
-        return normalVectors.map((normalVector) => normalVector.scale(-1));
+        changeVector = normalVectors.map((normalVector) =>
+          normalVector.scale(-1)
+        );
+        break;
       case OrientationShape.RIGHT: {
         const pituus = normalVectors.length;
         const kasvatus = this.jyrkkyys / pituus;
-        return normalVectors.map(
+        changeVector = normalVectors.map(
           (normalVector, index) =>
             new Vector3(
               normalVector.z,
-              normalVector.y + kasvatus * (index + 1),
+              normalVector.y,
+              //     normalVector.y + kasvatus * (index + 1),
               normalVector.x
             )
         );
+        break;
+      }
+      case OrientationShape.LEFT: {
+        changeVector = normalVectors.map(
+          (normalVector, index) =>
+            new Vector3(
+              -normalVector.z,
+              normalVector.y,
+              //     normalVector.y + kasvatus * (index + 1),
+              normalVector.x
+            ));
+        
+        break;
       }
 
       default:
-        return normalVectors;
+        changeVector = normalVectors;
     }
+    return changeVector;
 
-    normalVectors.map((normalVector) => normalVector.cross);
-    return [
-      new Vector3(0, 0, 1),
-      new Vector3(0, 0, 2),
-      new Vector3(0, 0, 3),
-      new Vector3(0, 0, 4),
-    ].map((single) => single.scale(this.orientation));
+
+    /*
+    return this.applyJyrkkyys(
+      [
+        new Vector3(0, 0, 1),
+        new Vector3(0, 0, 2),
+        new Vector3(0, 0, 3),
+        new Vector3(0, 0, 4),
+      ].map((single) => single.scale(this.orientation))
+    );
+    */
   }
 
   private applyJyrkkyys(normalVectors: Vector3[]): Vector3[] {

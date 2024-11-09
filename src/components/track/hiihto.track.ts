@@ -24,6 +24,7 @@ import { OrientationShape } from "./orientation.shape";
 import snowDiffuse from "./../../textures/snow_02_diff_2k.jpg";
 import snowAo from "./../../textures/snow_02_ao_2k.jpg";
 import snowBump from "./../../textures/snow_02_bump_2k.jpg";
+import armTextureJpg from './../../textures/snow_02_arm_2k.jpg';
 
 console.log("snow", snowDiffuse);
 export class HiihtoTrack {
@@ -76,6 +77,10 @@ export class HiihtoTrack {
     // this.points = allPoints;
     const shapes = [
       new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+
       new KaariTrack(),
       new SuoraTrack(OrientationShape.RIGHT),
       new SuoraTrack(OrientationShape.RIGHT),
@@ -90,7 +95,55 @@ export class HiihtoTrack {
       new KaariTrack(OrientationShape.RIGHT),
       new SuoraTrack(OrientationShape.OPPOSITE, 0.5),
       new SuoraTrack(OrientationShape.OPPOSITE, 0.5),
-      new SuoraTrack(OrientationShape.BOTTOM, 0.5),
+      new SuoraTrack(OrientationShape.OPPOSITE, 1),
+      new KaariTrack(OrientationShape.TOP_BOTTOM_RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT, 1),
+      new SuoraTrack(OrientationShape.RIGHT, 1),
+      new SuoraTrack(OrientationShape.RIGHT, 1),
+      new SuoraTrack(OrientationShape.RIGHT, 1),
+      new SuoraTrack(OrientationShape.RIGHT, 1),
+      new SuoraTrack(OrientationShape.RIGHT, 1),
+      new SuoraTrack(OrientationShape.RIGHT, 1),
+      new SuoraTrack(OrientationShape.RIGHT, 1),
+      new SuoraTrack(OrientationShape.RIGHT, 1),
+      new SuoraTrack(OrientationShape.RIGHT, 1),
+      new KaariTrack(OrientationShape.LEFT_BOTTOM_TOP),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new KaariTrack(OrientationShape.BOTTOM_TOP_LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new KaariTrack(OrientationShape.RIGHT_TOP_BOTTOM),
+
+
+
+
+
+      // new SuoraTrack(OrientationShape.BOTTOM, 0.5),
+     // new SuoraTrack(OrientationShape.BOTTOM, 1),
+     // new SuoraTrack(OrientationShape.BOTTOM, 1),
+
     ];
     let currentMoveVector = moveVector.clone();
     this.points = shapes.flatMap((shape: ShapeTrack) => {
@@ -127,9 +180,10 @@ export class HiihtoTrack {
   }
   createHiihtoTrackMaterial(scene: Scene): Material {
     const material = new StandardMaterial("latumaterial", scene);
-    material.diffuseTexture = this.createDiffuseTexture(scene);
+    material.diffuseTexture = this.createDiffuseTexture(scene); // this.createDiffuseTexture(scene);
     material.ambientTexture = this.createAmbientTexture(scene);
-    material.bumpTexture = this.createBumpTexture(scene);
+    this.createArmTexture(scene)
+;    //material.bumpTexture = this.createBumpTexture(scene);
     material.emissiveColor = new Color3(0.2, 0.2, 0.2);  // Adjust to control additional lightness
 
     return material;
@@ -138,9 +192,16 @@ export class HiihtoTrack {
   createDiffuseTexture(scene: Scene): Texture {
     const texture = new Texture(snowDiffuse, scene);
     texture.name = "SnowDiffuseTexture";
-    texture.level = 1.7;
-    texture.scale(10);
+    texture.level = 2.3;
+    texture.scale(0.3);
     return texture;
+  }
+
+  createArmTexture(scene: Scene): Texture {
+    const armTexture = new Texture(armTextureJpg, scene);
+    armTexture.name = "SnowArmTexture";
+    return armTexture;
+
   }
 
   createBumpTexture(scene: Scene): Texture {
@@ -156,7 +217,7 @@ export class HiihtoTrack {
   }
 
   getPoints(): Vector3[] {
-    const nth = 50;
+    const nth = 100;
     return this.spline
       .getPoints()
       .filter((_, index) => index % nth === nth - 1)

@@ -25,15 +25,26 @@ export class KaariTrack implements ShapeTrack {
     if (this.orientation === OrientationShape.OPPOSITE) {
       return points.map(point => new Vector3(point.z, 0, point.x));
     }
+    if (this.orientation === OrientationShape.TOP_BOTTOM_RIGHT) {
+      return points.map(point => new Vector3(point.x, 0, -point.z));
+    }
+
+    if (this.orientation === OrientationShape.LEFT_BOTTOM_TOP) {
+      return points.map(point => new Vector3(point.z, 0, point.x));
+    }
+    if (this.orientation === OrientationShape.BOTTOM_TOP_LEFT) {
+      return points.map(point => new Vector3(-point.x, 0, point.z));
+    }
+
+    if (this.orientation === OrientationShape.RIGHT_TOP_BOTTOM) {
+      return points.reverse();
+    }
     if (this.orientation === OrientationShape.RIGHT) {
 
       const rightPoints = points.map(point => 
-        new Vector3(point.z, point.y, -point.x));
-        console.log("riggt poits", rightPoints);
-        
-
+        new Vector3(point.z, point.y, -point.x));        
       return rightPoints;   
-    }
+      }
     return points;
   
     
