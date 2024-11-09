@@ -11,12 +11,14 @@ import { PlayerMesh } from "./player.mesh";
 export class HiihtoCamera {
   private camera: FollowCamera;
 
-  constructor(canvas: HTMLCanvasElement, scene: Scene) {
+  constructor(canvas: HTMLCanvasElement, scene: Scene, player: PlayerMesh) {
     this.camera = new FollowCamera(
       "HiihtoCamera",
       new Vector3(0, 10, -10),
-      scene
+      scene,
+      player.mesh
     );
+    this.camera.layerMask = 0;
     this.camera.radius = 20;
 
     this.camera.heightOffset = 8;
@@ -25,6 +27,9 @@ export class HiihtoCamera {
 
     this.camera.speed = 0.2;
     this.camera.attachControl(true);
+    this.camera.layerMask = 1;
+
+    //this.camera.setTarget(player.currentLoc);
   }
 
   setCameraTarget(mesh: PlayerMesh) {

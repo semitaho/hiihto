@@ -32,18 +32,14 @@ class App {
     var scene = new Scene(engine);
     new HiihtoLights(scene);
 
-    const camera = new HiihtoCamera(canvas, scene);
 
-    const terrain = new HiihtoTerrain(scene);
+   
+    const player = new PlayerMesh(scene);
     const moveVector1 = new Vector3(50, 1, 0);
-    const moveVector2 = new Vector3(55, 1, 3);
 
-    const track = new HiihtoTrack(scene, terrain, moveVector1);
+    const track = new HiihtoTrack(scene, moveVector1);
    // const track2 = new HiihtoTrack(scene, terrain, moveVector2);
 
-    const player = new PlayerMesh(scene, track);
-
-    camera.setCameraTarget(player);
 
     //var sphere: Mesh = MeshBuilder.CreateSphere("sphere", { diameter: 1 }, scene);
 
@@ -60,17 +56,22 @@ class App {
     });
 
     const points = track.getPoints();
-    player.setLocation(new Vector3(points[0].x, points[0].y, points[0].z));
     var currentIndex = 0;
+    player.setLocation(new Vector3(points[currentIndex].x, points[currentIndex].y, points[currentIndex].z));
+
     const nextLoc = points[currentIndex + 1];
     player.lookAtDirection(nextLoc, 100);
+    const camera = new HiihtoCamera(canvas, scene, player);
+    const terrain = new HiihtoTerrain(scene);
+
+
     //this.drawDebugWaypoints(scene,points);
     scene.registerBeforeRender(() => {
       if (currentIndex < points.length - 1) {
         const deltaTimeMs = engine.getDeltaTime() / 1000;
         const nextLoc = points[currentIndex + 1];
         const speed = deltaTimeMs * 10;
-        const rotSpeed = deltaTimeMs * 50;
+        const rotSpeed = deltaTimeMs * 60;
         const dist = Vector3.Distance(nextLoc, player.currentLoc);
         if (dist < 1) {
           currentIndex += 1;

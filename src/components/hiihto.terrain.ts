@@ -12,7 +12,7 @@ export class HiihtoTerrain {
       mapSubZ: mapSubZ,
       terrainSub: terrainSub, // how many terrain subdivisions wanted
     };
-    const terrain = new DynamicTerrain("t", params, scene);
+     new DynamicTerrain("Hiihtomaailma", params, scene);
   }
 
   private createMapData(mapSubX: number, mapSubZ: number): Float32Array {

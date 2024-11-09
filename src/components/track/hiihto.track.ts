@@ -16,7 +16,6 @@ import {
 } from "@babylonjs/core";
 import { HiihtoTerrain } from "../hiihto.terrain";
 import { LatuModel } from "../latu.model";
-import { KumpuTrack } from "./kumpu.track";
 import { ShapeTrack } from "./shape.track";
 import { KaariTrack } from "./kaari.track";
 import { SuoraTrack } from "./suora.track";
@@ -32,55 +31,14 @@ export class HiihtoTrack {
   private points: Vector3[];
   private spline: Curve3;
   private track: Mesh;
-  constructor(scene: Scene, terrain: HiihtoTerrain, moveVector: Vector3) {
-    /*
-    const allPoints = [
-      new Vector3(0, 1, 0),
-
-      new Vector3(5, 1, 0),
-
-      new Vector3(10, 1, 0),
-
-      new Vector3(15, 1, 0),
-
-      new Vector3(20, 1, 0),
-
-      new Vector3(25, 1, 0),
-
-      new Vector3(30, 1, 1),
-
-      new Vector3(35, 1, 2),
-
-      new Vector3(36, 1, 3),
-
-      new Vector3(40, 1, 5),
-      ...new KumpuTrack().getWorldPoints(new Vector3(40,1,10)),
-      /*
-      new Vector3(40, 1, 22),
-
-      new Vector3(40, 1, 25),
-
-      new Vector3(40, 1, 30),
-
-      new Vector3(40, 1, 35),
+  constructor(scene: Scene, moveVector: Vector3) {
 
 
-      new Vector3(20, 1, 60),
-      new Vector3(15, 1, 60),
-      new Vector3(10, 1, 60),
-
-      new Vector3(5, 1, 60),
-      new
-
-    */
-
-    // this.points = allPoints;
     const shapes = [
       new SuoraTrack(),
       new SuoraTrack(),
       new SuoraTrack(),
       new SuoraTrack(),
-
       new KaariTrack(),
       new SuoraTrack(OrientationShape.RIGHT),
       new SuoraTrack(OrientationShape.RIGHT),
@@ -88,15 +46,15 @@ export class HiihtoTrack {
       new SuoraTrack(OrientationShape.RIGHT),
       new SuoraTrack(OrientationShape.RIGHT),
       new SuoraTrack(OrientationShape.RIGHT, 1),
-      new SuoraTrack(OrientationShape.RIGHT, 2),
+      new SuoraTrack(OrientationShape.RIGHT, 1),
       new SuoraTrack(OrientationShape.RIGHT, 1),
 
-      new SuoraTrack(OrientationShape.RIGHT),
-      new KaariTrack(OrientationShape.RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT,1),
+      new KaariTrack(OrientationShape.RIGHT,1),
       new SuoraTrack(OrientationShape.OPPOSITE, 0.5),
       new SuoraTrack(OrientationShape.OPPOSITE, 0.5),
       new SuoraTrack(OrientationShape.OPPOSITE, 1),
-      new KaariTrack(OrientationShape.TOP_BOTTOM_RIGHT),
+      new KaariTrack(OrientationShape.TOP_BOTTOM_RIGHT, 1),
       new SuoraTrack(OrientationShape.RIGHT, 1),
       new SuoraTrack(OrientationShape.RIGHT, 1),
       new SuoraTrack(OrientationShape.RIGHT, 1),
@@ -121,6 +79,18 @@ export class HiihtoTrack {
       new KaariTrack(OrientationShape.BOTTOM_TOP_LEFT),
       new SuoraTrack(OrientationShape.LEFT),
       new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT, 1),
+      new SuoraTrack(OrientationShape.LEFT,2),
+      new SuoraTrack(OrientationShape.LEFT,3),
+      new SuoraTrack(OrientationShape.LEFT,4),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT, -0.5),
+      new SuoraTrack(OrientationShape.LEFT, -0.5),
+      new SuoraTrack(OrientationShape.LEFT, -0.5),
+      new SuoraTrack(OrientationShape.LEFT, -0.5),
+      new SuoraTrack(OrientationShape.LEFT, -1),
       new SuoraTrack(OrientationShape.LEFT),
       new SuoraTrack(OrientationShape.LEFT),
       new SuoraTrack(OrientationShape.LEFT),
@@ -134,8 +104,32 @@ export class HiihtoTrack {
       new SuoraTrack(OrientationShape.LEFT),
       new SuoraTrack(OrientationShape.LEFT),
       new SuoraTrack(OrientationShape.LEFT),
-      new KaariTrack(OrientationShape.RIGHT_TOP_BOTTOM),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
+      new SuoraTrack(OrientationShape.LEFT),
 
+      new KaariTrack(OrientationShape.RIGHT_TOP_BOTTOM),
+      new SuoraTrack(OrientationShape.OPPOSITE),
+      new SuoraTrack(OrientationShape.OPPOSITE),
+      new SuoraTrack(OrientationShape.OPPOSITE),
+      new SuoraTrack(OrientationShape.OPPOSITE),
+      new SuoraTrack(OrientationShape.OPPOSITE),
+      new SuoraTrack(OrientationShape.OPPOSITE),
+      new SuoraTrack(OrientationShape.OPPOSITE),
+      new SuoraTrack(OrientationShape.OPPOSITE),
+      new SuoraTrack(OrientationShape.OPPOSITE),
+      new SuoraTrack(OrientationShape.OPPOSITE),
+      new SuoraTrack(OrientationShape.OPPOSITE),
+      new KaariTrack(OrientationShape.TOP_BOTTOM_RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT),
+      new KaariTrack(OrientationShape.LEFT_BOTTOM_TOP),
 
 
 
@@ -168,10 +162,10 @@ export class HiihtoTrack {
       rotation: 0,
       sideOrientation: Mesh.DOUBLESIDE,
       updatable: true,
-      closeShape: false,
+      closeShape: true,
       adjustFrame: true,
       scale: 1,
-      //closePath: true,
+      closePath: true,
     });
     this.track.material = this.createHiihtoTrackMaterial(scene);
     this.track.subMeshes.push();

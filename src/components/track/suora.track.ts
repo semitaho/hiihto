@@ -2,11 +2,15 @@ import { Orientation, Vector3 } from "@babylonjs/core";
 import { ShapeTrack } from "./shape.track";
 import { OrientationShape } from "./orientation.shape";
 
-export class SuoraTrack implements ShapeTrack {
+export class SuoraTrack extends ShapeTrack {
   constructor(
-    private orientation = OrientationShape.DEFAULT,
-    private jyrkkyys = 0
-  ) {}
+    protected orientation = OrientationShape.DEFAULT,
+    protected jyrkkyys = 0
+  ) {
+    super(orientation, jyrkkyys);
+
+
+  }
   getPoints(): Vector3[] {
     const normalVectors = [
       new Vector3(0, 0, 1),
@@ -22,8 +26,6 @@ export class SuoraTrack implements ShapeTrack {
         );
         break;
       case OrientationShape.RIGHT: {
-        const pituus = normalVectors.length;
-        const kasvatus = this.jyrkkyys / pituus;
         changeVector = normalVectors.map(
           (normalVector, index) =>
             new Vector3(
@@ -51,31 +53,8 @@ export class SuoraTrack implements ShapeTrack {
       default:
         changeVector = normalVectors;
     }
-    return changeVector;
-
-
-    /*
-    return this.applyJyrkkyys(
-      [
-        new Vector3(0, 0, 1),
-        new Vector3(0, 0, 2),
-        new Vector3(0, 0, 3),
-        new Vector3(0, 0, 4),
-      ].map((single) => single.scale(this.orientation))
-    );
-    */
+    return this.applyJyrkkyys(changeVector);
   }
 
-  private applyJyrkkyys(normalVectors: Vector3[]): Vector3[] {
-    const pituus = normalVectors.length;
-    const kasvatus = this.jyrkkyys / pituus;
-    return normalVectors.map(
-      (normalVector, index) =>
-        new Vector3(
-          normalVector.z,
-          normalVector.y + kasvatus * (index + 1),
-          normalVector.x
-        )
-    );
-  }
+ 
 }

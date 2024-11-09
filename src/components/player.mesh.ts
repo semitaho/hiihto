@@ -13,7 +13,7 @@ import { HiihtoTrack } from "./track/hiihto.track";
 export class PlayerMesh {
   private _mesh: Mesh;
   private _transformNode: TransformNode;
-  constructor(scene: Scene, track: HiihtoTrack) {
+  constructor(scene: Scene) {
     this._transformNode = new TransformNode("hiihtoTransformNode", scene);
     this._transformNode.position = new Vector3(6, 0, 0); // Position of the mesh
     this._transformNode.rotation = new Vector3(0, Math.PI / 2, 0);
