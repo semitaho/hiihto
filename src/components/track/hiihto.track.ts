@@ -10,18 +10,24 @@ import {
   StandardMaterial,
   Path3D,
   Orientation,
+  SubMesh,
+  NodeMaterial,
+  Texture,
 } from "@babylonjs/core";
-import { DynamicTerrain } from "../../external/babylon.dynamic-terrain";
 import { HiihtoTerrain } from "../hiihto.terrain";
-import { LatuModel  } from "../latu.model";
+import { LatuModel } from "../latu.model";
 import { KumpuTrack } from "./kumpu.track";
 import { ShapeTrack } from "./shape.track";
 import { KaariTrack } from "./kaari.track";
 import { SuoraTrack } from "./suora.track";
 import { OrientationShape } from "./orientation.shape";
+import snowDiffuse from "./../../textures/snow_02_diff_2k.jpg";
+import snowAo from "./../../textures/snow_02_ao_2k.jpg";
+import snowBump from "./../../textures/snow_02_bump_2k.jpg";
 
+console.log("snow", snowDiffuse);
 export class HiihtoTrack {
-  private readonly POINTS_LENGTH_RATIO  = 1;
+  private readonly POINTS_LENGTH_RATIO = 1;
   private points: Vector3[];
   private spline: Curve3;
   private track: Mesh;
@@ -57,81 +63,51 @@ export class HiihtoTrack {
 
       new Vector3(40, 1, 35),
 
-      new Vector3(40, 1, 40),
-      new Vector3(40, 1, 45),
-
-      new Vector3(40, 1, 50),
-
-      new Vector3(40, 1, 55),
-      new Vector3(40, 1, 60),
-      new Vector3(35, 1, 60),
-
-      new Vector3(30, 1, 60),
-      new Vector3(25, 1, 60),
 
       new Vector3(20, 1, 60),
       new Vector3(15, 1, 60),
       new Vector3(10, 1, 60),
 
       new Vector3(5, 1, 60),
-      new Vector3(0, 1, 60),
-      new Vector3(0, 1, 55),
-      new Vector3(0, 1, 50),
-      new Vector3(0, 1, 45),
-      new Vector3(0, 1, 40),
-
-      new Vector3(0, 1, 35),
-      new Vector3(0, 1, 30),
-      new Vector3(0, 1, 25),
-      new Vector3(0, 1, 20),
-      new Vector3(0, 1, 15),
-      new Vector3(0, 1, 10),
-      new Vector3(0, 1, 5),
-
-      new Vector3(0, 1, 1),
-    ].map((current) => current.add(this.MOVE_VECTOR));
+      new
 
     */
 
-   // this.points = allPoints;
-    const shapes= [
-  
-  new SuoraTrack(),
-  new KaariTrack(),
-  new SuoraTrack(OrientationShape.RIGHT),
-  new SuoraTrack(OrientationShape.RIGHT),
-  new SuoraTrack(OrientationShape.RIGHT),
-  new SuoraTrack(OrientationShape.RIGHT),
-  new SuoraTrack(OrientationShape.RIGHT),
-  new SuoraTrack(OrientationShape.RIGHT, 1),
-  new SuoraTrack(OrientationShape.RIGHT, 2),
-  new SuoraTrack(OrientationShape.RIGHT, 1),
+    // this.points = allPoints;
+    const shapes = [
+      new SuoraTrack(),
+      new KaariTrack(),
+      new SuoraTrack(OrientationShape.RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT),
+      new SuoraTrack(OrientationShape.RIGHT, 1),
+      new SuoraTrack(OrientationShape.RIGHT, 2),
+      new SuoraTrack(OrientationShape.RIGHT, 1),
 
-  new SuoraTrack(OrientationShape.RIGHT),
-  new KaariTrack(OrientationShape.RIGHT),
-  new SuoraTrack(OrientationShape.OPPOSITE, 0.5),
-  new SuoraTrack(OrientationShape.OPPOSITE, 0.5),
-  new SuoraTrack(OrientationShape.BOTTOM, 0.5),
-
-    
+      new SuoraTrack(OrientationShape.RIGHT),
+      new KaariTrack(OrientationShape.RIGHT),
+      new SuoraTrack(OrientationShape.OPPOSITE, 0.5),
+      new SuoraTrack(OrientationShape.OPPOSITE, 0.5),
+      new SuoraTrack(OrientationShape.BOTTOM, 0.5),
     ];
     let currentMoveVector = moveVector.clone();
-    this.points  = shapes.flatMap((shape: ShapeTrack) => {
+    this.points = shapes.flatMap((shape: ShapeTrack) => {
       const shapeRelativePoints = shape.getPoints();
-      const shapeWorldPoints = shapeRelativePoints.map((current) => current.add(currentMoveVector));
+      const shapeWorldPoints = shapeRelativePoints.map((current) =>
+        current.add(currentMoveVector)
+      );
       currentMoveVector = shapeWorldPoints[shapeRelativePoints.length - 1];
       return shapeWorldPoints;
-
     });
 
-
     // Create a Catmull-Rom spline from the points
-     this.spline = Curve3.CreateCatmullRomSpline(this.points, 100); // 20 is the number of subdivisions
-  
+    this.spline = Curve3.CreateCatmullRomSpline(this.points, 100); // 20 is the number of subdivisions
 
     // Get the points along the spline
     const splinePoints = this.spline.getPoints();
-// new Vector3(-1.8, -0.4, 0)
+    // new Vector3(-1.8, -0.4, 0)
     this.track = MeshBuilder.ExtrudeShape("track", {
       cap: Mesh.NO_CAP,
       shape: new LatuModel().getShape(),
@@ -145,24 +121,46 @@ export class HiihtoTrack {
       //closePath: true,
     });
     this.track.material = this.createHiihtoTrackMaterial(scene);
+    this.track.subMeshes.push();
 
     this.track.convertToFlatShadedMesh();
   }
   createHiihtoTrackMaterial(scene: Scene): Material {
     const material = new StandardMaterial("latumaterial", scene);
+    material.diffuseTexture = this.createDiffuseTexture(scene);
+    material.ambientTexture = this.createAmbientTexture(scene);
+    material.bumpTexture = this.createBumpTexture(scene);
+    material.emissiveColor = new Color3(0.2, 0.2, 0.2);  // Adjust to control additional lightness
 
-    material.roughness = 0.9;
-    material.diffuseColor = Color3.White();
-
-    //material.specularColor = Color3.White();
     return material;
   }
 
-  getPoints(): Vector3[] { 
+  createDiffuseTexture(scene: Scene): Texture {
+    const texture = new Texture(snowDiffuse, scene);
+    texture.name = "SnowDiffuseTexture";
+    texture.level = 1.7;
+    texture.scale(10);
+    return texture;
+  }
+
+  createBumpTexture(scene: Scene): Texture {
+    const texture = new Texture(snowBump, scene);
+    texture.name = "SnowBumpTexture";
+    return texture;
+  }
+
+  createAmbientTexture(scene: Scene): Texture {
+    const texture = new Texture(snowAo, scene);
+    texture.name = "SnowAmbientTexture";
+    return texture;
+  }
+
+  getPoints(): Vector3[] {
     const nth = 50;
-    return this.spline.getPoints()
-    .filter((_, index) => index % nth  === nth - 1)
-    .map(vector => new Vector3(vector.x, vector.y+0.3, vector.z));
+    return this.spline
+      .getPoints()
+      .filter((_, index) => index % nth === nth - 1)
+      .map((vector) => new Vector3(vector.x, vector.y + 0.3, vector.z));
   }
 
   getStartPosition(): Vector3 {

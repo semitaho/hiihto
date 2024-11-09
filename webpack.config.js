@@ -1,6 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { type } = require("os");
 
 const appDirectory = fs.realpathSync(process.cwd());
 
@@ -29,6 +30,11 @@ module.exports = {
                 use: "ts-loader",
                 exclude: /node_modules/,
             },
+
+            {
+                test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                type: 'asset/resource'
+             }
         ],
     },
     plugins: [
