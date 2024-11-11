@@ -3,7 +3,7 @@ import { OrientationShape } from "./orientation.shape";
 
 export abstract class ShapeTrack {
 
-  constructor(protected orientation: OrientationShape, protected jyrkkyys: number) {
+  constructor(protected jyrkkyys: number) {
 
   }
 

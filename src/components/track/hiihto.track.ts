@@ -13,6 +13,9 @@ import {
   SubMesh,
   NodeMaterial,
   Texture,
+  Matrix,
+  Quaternion,
+  TransformNode,
 } from "@babylonjs/core";
 import { HiihtoTerrain } from "../hiihto.terrain";
 import { LatuModel } from "../latu.model";
@@ -23,7 +26,7 @@ import { OrientationShape } from "./orientation.shape";
 import snowDiffuse from "./../../textures/snow_02_diff_2k.jpg";
 import snowAo from "./../../textures/snow_02_ao_2k.jpg";
 import snowBump from "./../../textures/snow_02_bump_2k.jpg";
-import armTextureJpg from './../../textures/snow_02_arm_2k.jpg';
+import armTextureJpg from "./../../textures/snow_02_arm_2k.jpg";
 
 console.log("snow", snowDiffuse);
 export class HiihtoTrack {
@@ -32,16 +35,60 @@ export class HiihtoTrack {
   private spline: Curve3;
   private track: Mesh;
   constructor(scene: Scene, moveVector: Vector3) {
-
-
     const shapes = [
+      new SuoraTrack(),
+      new SuoraTrack(),
+
+      new KaariTrack(),
+     
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new KaariTrack(OrientationShape.DEFAULT, 0, Math.PI / 4),
+
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(1),
+      new SuoraTrack(1),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(-1),
+      new SuoraTrack(-1),
+      new SuoraTrack(-1),
+      new SuoraTrack(-0.5),
+      new SuoraTrack(-1),
+      new SuoraTrack(-1),
+      new SuoraTrack(1),
+      new SuoraTrack(1),
+      new SuoraTrack(0.5),
+      new SuoraTrack(1),
+      new SuoraTrack(2),
+      new SuoraTrack(2),
+      new SuoraTrack(-0.2),
       new SuoraTrack(),
       new SuoraTrack(),
       new SuoraTrack(),
       new SuoraTrack(),
       new KaariTrack(),
-      new SuoraTrack(OrientationShape.RIGHT),
-      new SuoraTrack(OrientationShape.RIGHT),
+      new SuoraTrack(-1),
+      new SuoraTrack(-1.5),
+      new SuoraTrack(-2),
+      new KaariTrack(OrientationShape.DEFAULT, 0, Math.PI / 4),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new KaariTrack(OrientationShape.DEFAULT, 0, Math.PI / 4),
+      new KaariTrack(OrientationShape.DEFAULT, 0, Math.PI / 4),
+
+      // new KaariTrack(),
+      //new KaariTrack(OrientationShape.OPPOSITE),
+      
+
+      /*
       new SuoraTrack(OrientationShape.RIGHT),
       new SuoraTrack(OrientationShape.RIGHT),
       new SuoraTrack(OrientationShape.RIGHT),
@@ -137,17 +184,36 @@ export class HiihtoTrack {
       // new SuoraTrack(OrientationShape.BOTTOM, 0.5),
      // new SuoraTrack(OrientationShape.BOTTOM, 1),
      // new SuoraTrack(OrientationShape.BOTTOM, 1),
-
+     */
     ];
-    let currentMoveVector = moveVector.clone();
+    let currentMoveOffset: Vector3 = moveVector.clone();
+
+    let directionVector = Vector3.Forward();
+
     this.points = shapes.flatMap((shape: ShapeTrack) => {
       const shapeRelativePoints = shape.getPoints();
-      const shapeWorldPoints = shapeRelativePoints.map((current) =>
-        current.add(currentMoveVector)
+      const rotationQuaternion = Quaternion.FromUnitVectorsToRef(
+        Vector3.Forward(),
+        directionVector,
+        new Quaternion()
       );
-      currentMoveVector = shapeWorldPoints[shapeRelativePoints.length - 1];
+      const shapeWorldPoints = shapeRelativePoints.map((current, index) => {
+        const rotationVector = current.rotateByQuaternionToRef(
+          rotationQuaternion,
+          new Vector3()
+        );
+
+        return currentMoveOffset.add(rotationVector);
+      });
+
+      currentMoveOffset = shapeWorldPoints[shapeWorldPoints.length - 1];
+      directionVector = shapeWorldPoints[shapeWorldPoints.length - 1]
+        .subtract(shapeWorldPoints[shapeWorldPoints.length - 2])
+        .normalize();
+      console.log("new direction:" + directionVector);
       return shapeWorldPoints;
     });
+    console.log("shapeworldpoints", this.points);
 
     // Create a Catmull-Rom spline from the points
     this.spline = Curve3.CreateCatmullRomSpline(this.points, 100); // 20 is the number of subdivisions
@@ -165,7 +231,7 @@ export class HiihtoTrack {
       closeShape: true,
       adjustFrame: true,
       scale: 1,
-      closePath: true,
+      closePath: false,
     });
     this.track.material = this.createHiihtoTrackMaterial(scene);
     this.track.subMeshes.push();
@@ -176,9 +242,8 @@ export class HiihtoTrack {
     const material = new StandardMaterial("latumaterial", scene);
     material.diffuseTexture = this.createDiffuseTexture(scene); // this.createDiffuseTexture(scene);
     material.ambientTexture = this.createAmbientTexture(scene);
-    this.createArmTexture(scene)
-;    //material.bumpTexture = this.createBumpTexture(scene);
-    material.emissiveColor = new Color3(0.2, 0.2, 0.2);  // Adjust to control additional lightness
+    this.createArmTexture(scene); //material.bumpTexture = this.createBumpTexture(scene);
+    material.emissiveColor = new Color3(0.2, 0.2, 0.2); // Adjust to control additional lightness
 
     return material;
   }
@@ -195,7 +260,6 @@ export class HiihtoTrack {
     const armTexture = new Texture(armTextureJpg, scene);
     armTexture.name = "SnowArmTexture";
     return armTexture;
-
   }
 
   createBumpTexture(scene: Scene): Texture {
@@ -211,7 +275,7 @@ export class HiihtoTrack {
   }
 
   getPoints(): Vector3[] {
-    const nth = 100;
+    const nth = 150;
     return this.spline
       .getPoints()
       .filter((_, index) => index % nth === nth - 1)

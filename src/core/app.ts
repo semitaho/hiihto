@@ -70,7 +70,7 @@ class App {
       if (currentIndex < points.length - 1) {
         const deltaTimeMs = engine.getDeltaTime() / 1000;
         const nextLoc = points[currentIndex + 1];
-        const speed = deltaTimeMs * 10;
+        const speed = deltaTimeMs * 20;
         const rotSpeed = deltaTimeMs * 60;
         const dist = Vector3.Distance(nextLoc, player.currentLoc);
         if (dist < 1) {
