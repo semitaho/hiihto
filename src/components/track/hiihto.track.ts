@@ -18,191 +18,123 @@ import {
   TransformNode,
 } from "@babylonjs/core";
 import { HiihtoTerrain } from "../hiihto.terrain";
-import { LatuModel } from "../latu.model";
+import { LatuModel } from "../models/latu.model";
 import { ShapeTrack } from "./shape.track";
 import { KaariTrack } from "./kaari.track";
 import { SuoraTrack } from "./suora.track";
 import { OrientationShape } from "./orientation.shape";
-import snowDiffuse from "./../../textures/snow_02_diff_2k.jpg";
-import snowAo from "./../../textures/snow_02_ao_2k.jpg";
-import snowBump from "./../../textures/snow_02_bump_2k.jpg";
-import armTextureJpg from "./../../textures/snow_02_arm_2k.jpg";
+import snowDiffuse from "./../../assets/textures/snow_02_diff_2k.jpg";
+import snowAo from "./../..//assets/textures/snow_02_ao_2k.jpg";
+import snowBump from "./../..//assets/textures/snow_02_bump_2k.jpg";
+import armTextureJpg from "./../..//assets/textures/snow_02_arm_2k.jpg";
+import { PitkasuoraTrack } from "./pitkasuora.track";
 
-console.log("snow", snowDiffuse);
 export class HiihtoTrack {
   private readonly POINTS_LENGTH_RATIO = 1;
   private points: Vector3[];
   private spline: Curve3;
   private track: Mesh;
+  private texturePath = './../..//assets/textures/';
   constructor(scene: Scene, moveVector: Vector3) {
     const shapes = [
       new SuoraTrack(),
       new SuoraTrack(),
+      //new SuoraTrack(),
 
-      new KaariTrack(),
-     
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new KaariTrack(OrientationShape.DEFAULT, 0, Math.PI / 4),
+      new KaariTrack(OrientationShape.DEFAULT, Math.PI / 4),
 
       new SuoraTrack(),
+      new SuoraTrack(1),
+      new SuoraTrack(2),
+      new SuoraTrack(2),
+      new SuoraTrack(3),
+      new SuoraTrack(-1),
+      new KaariTrack(OrientationShape.OPPOSITE, Math.PI / 4),
+      new SuoraTrack(),
       new SuoraTrack(),
       new SuoraTrack(1),
-      new SuoraTrack(1),
       new SuoraTrack(),
       new SuoraTrack(),
+      new KaariTrack(OrientationShape.DEFAULT, Math.PI / 4),
       new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(-1),
-      new SuoraTrack(-1),
-      new SuoraTrack(-1),
-      new SuoraTrack(-0.5),
-      new SuoraTrack(-1),
-      new SuoraTrack(-1),
+      new SuoraTrack(2),
       new SuoraTrack(1),
       new SuoraTrack(1),
+      new KaariTrack(OrientationShape.DEFAULT, Math.PI / 5),
+      new SuoraTrack(),
       new SuoraTrack(0.5),
+      new SuoraTrack(0.5),
+      new PitkasuoraTrack(),
+      new PitkasuoraTrack(),
+      new SuoraTrack(),
+      new KaariTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(),
+      new SuoraTrack(-0.5),
+
+      new SuoraTrack(0.5),
+      new SuoraTrack(0.5),
+      new SuoraTrack(0.5),
+      new KaariTrack(OrientationShape.OPPOSITE, Math.PI / 2),
+      new SuoraTrack(),
+      new SuoraTrack(-1),
+      new SuoraTrack(-1),
+      new SuoraTrack(-1),
+      new KaariTrack(OrientationShape.OPPOSITE, Math.PI / 4, -1),
+      new KaariTrack(OrientationShape.DEFAULT, Math.PI / 3, -1),
+      new KaariTrack(OrientationShape.DEFAULT, Math.PI / 4, -1),
+      new SuoraTrack(1),
+      new SuoraTrack(3),
+      new SuoraTrack(3),
+      new PitkasuoraTrack(2),
+      new SuoraTrack(2),
+      new KaariTrack(OrientationShape.DEFAULT, Math.PI / 3, 1),
+      new SuoraTrack(1),
+      new SuoraTrack(1),
+      new PitkasuoraTrack(),
+      new SuoraTrack(-1),
+      new SuoraTrack(-2),
+      new SuoraTrack(-1),
+      new KaariTrack(),
+      new SuoraTrack(-1),
+      new SuoraTrack(-1),
+      new SuoraTrack(-2),
+      new SuoraTrack(-2),
+      new SuoraTrack(-3),
+      new SuoraTrack(-3),
+      new SuoraTrack(-3),
+      new SuoraTrack(-3),
+      new SuoraTrack(-2),
+      new SuoraTrack(),
+
+      new KaariTrack(OrientationShape.OPPOSITE, Math.PI / 3),
+      new SuoraTrack(),
+      new SuoraTrack(),
+
       new SuoraTrack(1),
       new SuoraTrack(2),
       new SuoraTrack(2),
-      new SuoraTrack(-0.2),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
       new KaariTrack(),
-      new SuoraTrack(-1),
-      new SuoraTrack(-1.5),
-      new SuoraTrack(-2),
-      new KaariTrack(OrientationShape.DEFAULT, 0, Math.PI / 4),
       new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new KaariTrack(OrientationShape.DEFAULT, 0, Math.PI / 4),
-      new KaariTrack(OrientationShape.DEFAULT, 0, Math.PI / 4),
-
-      // new KaariTrack(),
-      //new KaariTrack(OrientationShape.OPPOSITE),
-      
-
-      /*
-      new SuoraTrack(OrientationShape.RIGHT),
-      new SuoraTrack(OrientationShape.RIGHT),
-      new SuoraTrack(OrientationShape.RIGHT),
-      new SuoraTrack(OrientationShape.RIGHT, 1),
-      new SuoraTrack(OrientationShape.RIGHT, 1),
-      new SuoraTrack(OrientationShape.RIGHT, 1),
-
-      new SuoraTrack(OrientationShape.RIGHT,1),
-      new KaariTrack(OrientationShape.RIGHT,1),
-      new SuoraTrack(OrientationShape.OPPOSITE, 0.5),
-      new SuoraTrack(OrientationShape.OPPOSITE, 0.5),
-      new SuoraTrack(OrientationShape.OPPOSITE, 1),
-      new KaariTrack(OrientationShape.TOP_BOTTOM_RIGHT, 1),
-      new SuoraTrack(OrientationShape.RIGHT, 1),
-      new SuoraTrack(OrientationShape.RIGHT, 1),
-      new SuoraTrack(OrientationShape.RIGHT, 1),
-      new SuoraTrack(OrientationShape.RIGHT, 1),
-      new SuoraTrack(OrientationShape.RIGHT, 1),
-      new SuoraTrack(OrientationShape.RIGHT, 1),
-      new SuoraTrack(OrientationShape.RIGHT, 1),
-      new SuoraTrack(OrientationShape.RIGHT, 1),
-      new SuoraTrack(OrientationShape.RIGHT, 1),
-      new SuoraTrack(OrientationShape.RIGHT, 1),
-      new KaariTrack(OrientationShape.LEFT_BOTTOM_TOP),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new SuoraTrack(),
-      new KaariTrack(OrientationShape.BOTTOM_TOP_LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT, 1),
-      new SuoraTrack(OrientationShape.LEFT,2),
-      new SuoraTrack(OrientationShape.LEFT,3),
-      new SuoraTrack(OrientationShape.LEFT,4),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT, -0.5),
-      new SuoraTrack(OrientationShape.LEFT, -0.5),
-      new SuoraTrack(OrientationShape.LEFT, -0.5),
-      new SuoraTrack(OrientationShape.LEFT, -0.5),
-      new SuoraTrack(OrientationShape.LEFT, -1),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-      new SuoraTrack(OrientationShape.LEFT),
-
-      new KaariTrack(OrientationShape.RIGHT_TOP_BOTTOM),
-      new SuoraTrack(OrientationShape.OPPOSITE),
-      new SuoraTrack(OrientationShape.OPPOSITE),
-      new SuoraTrack(OrientationShape.OPPOSITE),
-      new SuoraTrack(OrientationShape.OPPOSITE),
-      new SuoraTrack(OrientationShape.OPPOSITE),
-      new SuoraTrack(OrientationShape.OPPOSITE),
-      new SuoraTrack(OrientationShape.OPPOSITE),
-      new SuoraTrack(OrientationShape.OPPOSITE),
-      new SuoraTrack(OrientationShape.OPPOSITE),
-      new SuoraTrack(OrientationShape.OPPOSITE),
-      new SuoraTrack(OrientationShape.OPPOSITE),
-      new KaariTrack(OrientationShape.TOP_BOTTOM_RIGHT),
-      new SuoraTrack(OrientationShape.RIGHT),
-      new SuoraTrack(OrientationShape.RIGHT),
-      new SuoraTrack(OrientationShape.RIGHT),
-      new SuoraTrack(OrientationShape.RIGHT),
-      new SuoraTrack(OrientationShape.RIGHT),
-      new SuoraTrack(OrientationShape.RIGHT),
-      new SuoraTrack(OrientationShape.RIGHT),
-      new KaariTrack(OrientationShape.LEFT_BOTTOM_TOP),
-
-
-
-
-      // new SuoraTrack(OrientationShape.BOTTOM, 0.5),
-     // new SuoraTrack(OrientationShape.BOTTOM, 1),
-     // new SuoraTrack(OrientationShape.BOTTOM, 1),
-     */
     ];
     let currentMoveOffset: Vector3 = moveVector.clone();
 
-    let directionVector = Vector3.Forward();
+    let directionVector = currentMoveOffset;
 
-    this.points = shapes.flatMap((shape: ShapeTrack) => {
+    this.points = shapes.flatMap((shape: ShapeTrack, index: number) => {
       const shapeRelativePoints = shape.getPoints();
       const rotationQuaternion = Quaternion.FromUnitVectorsToRef(
         Vector3.Forward(),
         directionVector,
         new Quaternion()
       );
+
       const shapeWorldPoints = shapeRelativePoints.map((current, index) => {
         const rotationVector = current.rotateByQuaternionToRef(
           rotationQuaternion,
           new Vector3()
         );
-
         return currentMoveOffset.add(rotationVector);
       });
 
@@ -210,13 +142,14 @@ export class HiihtoTrack {
       directionVector = shapeWorldPoints[shapeWorldPoints.length - 1]
         .subtract(shapeWorldPoints[shapeWorldPoints.length - 2])
         .normalize();
-      console.log("new direction:" + directionVector);
+
+      directionVector.y = 0;
+
       return shapeWorldPoints;
     });
-    console.log("shapeworldpoints", this.points);
 
     // Create a Catmull-Rom spline from the points
-    this.spline = Curve3.CreateCatmullRomSpline(this.points, 100); // 20 is the number of subdivisions
+    this.spline = Curve3.CreateCatmullRomSpline(this.points, 100, false); // 20 is the number of subdivisions
 
     // Get the points along the spline
     const splinePoints = this.spline.getPoints();
@@ -234,7 +167,8 @@ export class HiihtoTrack {
       closePath: false,
     });
     this.track.material = this.createHiihtoTrackMaterial(scene);
-    this.track.subMeshes.push();
+    this.track.receiveShadows = true;
+    this.track.renderingGroupId = 1;
 
     this.track.convertToFlatShadedMesh();
   }
@@ -270,16 +204,21 @@ export class HiihtoTrack {
 
   createAmbientTexture(scene: Scene): Texture {
     const texture = new Texture(snowAo, scene);
-    texture.name = "SnowAmbientTexture";
+    texture.name = "S<nowAmbientTexture";
+    texture.level = 1.2;
     return texture;
   }
 
-  getPoints(): Vector3[] {
+  getWaypointPoints(): Vector3[] {
     const nth = 150;
     return this.spline
       .getPoints()
       .filter((_, index) => index % nth === nth - 1)
       .map((vector) => new Vector3(vector.x, vector.y + 0.3, vector.z));
+  }
+
+  getPoints(): Vector3[] {
+    return this.spline.getPoints();
   }
 
   getStartPosition(): Vector3 {

@@ -1,18 +1,24 @@
 import { Scene } from "@babylonjs/core";
 import { DynamicTerrain } from "../external/babylon.dynamic-terrain";
+import { HiihtoTrack } from "./track/hiihto.track";
 
 export class HiihtoTerrain {
+
+
+  private readonly width: number = 1000;
+  private readonly depth: number = 800;
+
+  private terrainData: DynamicTerrain;
   constructor(scene: Scene) {
-    const mapSubX = 1000; // map number of points on the width
-    const mapSubZ = 800;
+    
     const terrainSub = 100; // 100 terrain subdivisions
     const params = {
-      mapData: this.createMapData(mapSubX, mapSubZ), // data map declaration: what data to use?
-      mapSubX: mapSubX, // how are these data stored by rows and columns
-      mapSubZ: mapSubZ,
+      mapData: this.createMapData(this.width, this.depth), // data map declaration: what data to use?
+      mapSubX: this.width, // how are these data stored by rows and columns
+      mapSubZ: this.depth,
       terrainSub: terrainSub, // how many terrain subdivisions wanted
     };
-     new DynamicTerrain("Hiihtomaailma", params, scene);
+     this.terrainData = new DynamicTerrain("Hiihtomaailma", params, scene);
   }
 
   private createMapData(mapSubX: number, mapSubZ: number): Float32Array {
@@ -32,4 +38,51 @@ export class HiihtoTerrain {
     }
     return mapData;
   }
+
+  public update(hiihtotrack: HiihtoTrack) {
+
+    const points = hiihtotrack.getPoints();
+  
+    console.log('mapdata', this.terrainData.mapData);
+ 
+    for (let i = 0; i < points.length; i++) {
+    }
+
+    /*
+    for (let yIndex = 1; yIndex < this.terrainData.mapData.length ;  yIndex = yIndex + 3) {
+      this.terrainData.mapData[yIndex] = -0.3;
+
+    }
+      */
+
+
+  }
+
+  getMapDataPoint(worldPoint, terrainOrigin) {
+    const mapData = this.terrainData.mapData as Float32Array;
+
+    const mapResolutionX =4; // Number of columns
+    const mapResolutionZ = mapData.length;   // Number of rows
+
+    // Calculate cell size
+    const cellSizeX = this.width / mapResolutionX;
+    const cellSizeZ = this.depth / mapResolutionZ;
+
+    // Transform world coordinates to map coordinates
+    const relativeX = worldPoint.x - terrainOrigin.x;
+    const relativeZ = worldPoint.z - terrainOrigin.z;
+
+    // Find corresponding map indices
+    const mapX = Math.floor(relativeX / cellSizeX);
+    const mapZ = Math.floor(relativeZ / cellSizeZ);
+
+    // Ensure indices are within bounds
+    const clampedX = Math.max(0, Math.min(mapX, mapResolutionX - 1));
+    const clampedZ = Math.max(0, Math.min(mapZ, mapResolutionZ - 1));
+
+    // Get the corresponding map data height
+    const height = mapData[clampedZ][clampedX];
+
+    return { mapX: clampedX, mapZ: clampedZ, height };
+}
 }

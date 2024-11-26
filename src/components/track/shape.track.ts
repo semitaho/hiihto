@@ -13,7 +13,7 @@ export abstract class ShapeTrack {
     const jyrkkyysaskel = this.jyrkkyys / changeVector.length;
     return changeVector.map(
       (vector, index) =>
-        new Vector3(vector.x, ((index + 1) / 2) * jyrkkyysaskel + vector.y, vector.z)
+        new Vector3(vector.x, ((index + 1) / 3) * jyrkkyysaskel + vector.y, vector.z)
     );
   }
 }

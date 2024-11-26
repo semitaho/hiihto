@@ -5,16 +5,18 @@ import { OrientationShape } from "./orientation.shape";
 export class KaariTrack extends ShapeTrack {
   constructor(
     protected orientation = OrientationShape.DEFAULT,
+    private angle = Math.PI / 2,
     protected jyrkkyys = 0,
-    private angle = Math.PI / 2
+
   ) {
     super( jyrkkyys);
 
   }
+ 
 
   getPoints(): Vector3[] {
     let points = [];
-    const numPoints = 5;
+    const numPoints = 10;
     const radius = 5;
     const angleStep = this.angle / (numPoints - 1);
 
@@ -22,8 +24,9 @@ export class KaariTrack extends ShapeTrack {
       const angle = i * angleStep;
       const x = radius - radius * Math.cos(angle);
       const z = radius * Math.sin(angle);
-      points.push(new Vector3(x, 0, z));
+      points.push(new Vector3(this.orientation === OrientationShape.OPPOSITE ? -x :  x, 0, z));
     }
+   // points.push(new Vector3(this.orientation === OrientationShape.OPPOSITE ? lastPoint.x -0.5 : lastPoint.x + 0.5 ,lastPoint.y,lastPoint.z));
 
     return this.applyJyrkkyys(points);
   }

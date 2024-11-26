@@ -43,8 +43,6 @@ export class LatuModel {
     const xValues = sharepoints.map(point => point.x);
     const width = Math.max(...xValues) - Math.min(...xValues);
     const center = width / 2;
-    console.log('whole width:', width);
-
      return sharepoints.map(shapepoint => new Vector3(shapepoint.x-center,  shapepoint.y, shapepoint.z));
   }
 

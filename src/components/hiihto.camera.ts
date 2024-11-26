@@ -5,13 +5,12 @@ import {
   Scene,
   Vector3,
 } from "@babylonjs/core";
-import { HiihtoTrack } from "./track/hiihto.track";
-import { PlayerMesh } from "./player.mesh";
+import { PlayerModel } from "./models/player.model";
 
 export class HiihtoCamera {
   private camera: FollowCamera;
 
-  constructor(canvas: HTMLCanvasElement, scene: Scene, player: PlayerMesh) {
+  constructor(canvas: HTMLCanvasElement, scene: Scene, player: PlayerModel) {
     this.camera = new FollowCamera(
       "HiihtoCamera",
       new Vector3(0, 10, -10),
@@ -32,7 +31,7 @@ export class HiihtoCamera {
     //this.camera.setTarget(player.currentLoc);
   }
 
-  setCameraTarget(mesh: PlayerMesh) {
+  setCameraTarget(mesh: PlayerModel) {
     this.camera.lockedTarget = mesh.mesh;
   }
 }
