@@ -18,6 +18,9 @@ export class PlayerModel {
   private _mesh: Mesh;
   private _skeleton: Skeleton;
 
+  private readonly spineIndex = 3;
+  private readonly headIndex = 5;
+
   private readonly leftHandIndex = 32;
   private readonly leftWristIndex = 34;
 
@@ -64,16 +67,43 @@ export class PlayerModel {
       bone.scale(1, 1, 1); // Normalize bone scaling
     });
     skeleton.computeAbsoluteMatrices();
-    const sauvaLeft = new SauvaModel(this._scene, skeleton.bones[this.leftWristIndex], this._mesh, -1);
-    const sauvaRight = new SauvaModel(this._scene, skeleton.bones[this.rightWristIndex], this._mesh, 1);
-     new SuksiModel(this._scene, skeleton.bones[this.leftFootIndex], this._mesh, -1);
-     new SuksiModel(this._scene, skeleton.bones[this.rightFootIndex], this._mesh, 1);
+    const sauvaLeft = new SauvaModel(
+      this._scene,
+      skeleton.bones[this.leftWristIndex],
+      this._mesh,
+      -1
+    );
+    const sauvaRight = new SauvaModel(
+      this._scene,
+      skeleton.bones[this.rightWristIndex],
+      this._mesh,
+      1
+    );
+    new SuksiModel(
+      this._scene,
+      skeleton.bones[this.leftFootIndex],
+      this._mesh,
+      -1
+    );
+    new SuksiModel(
+      this._scene,
+      skeleton.bones[this.rightFootIndex],
+      this._mesh,
+      1
+    );
 
     const removableAnimeIndices = [
       1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-      23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34, 35, 36, 37, 38, 39, 
-      42, 43, 44,
+      23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34, 35, 36, 37, 38, 39, 42, 43,
+      44,
     ];
+
+    let indices = [this.spineIndex];
+    indices.forEach((index) => {
+      skeleton.bones[index].rotate(Axis.Z, Math.PI / 3);
+    });
+
+    skeleton.bones[this.headIndex].rotate(Axis.Z, -Math.PI / 3);
 
     removableAnimeIndices.forEach((index) => {
       skeleton.bones[index].animations = [];
@@ -102,7 +132,7 @@ export class PlayerModel {
         rotationAngles.y,
         rotationAngles.z
       );
-      //const newRotation =rotation.multiplyInPlace(Quaternion.RotationAxis(Axis.Z,- Math.PI / 2));      
+      //const newRotation =rotation.multiplyInPlace(Quaternion.RotationAxis(Axis.Z,- Math.PI / 2));
       const newMatrix = Matrix.Compose(scale, newRotation, translation);
       keyFrames[index].value = newMatrix;
     });

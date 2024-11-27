@@ -2,6 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { type } = require("os");
+const CopyPlugin = require("copy-webpack-plugin");
 
 const appDirectory = fs.realpathSync(process.cwd());
 
@@ -32,12 +33,21 @@ module.exports = {
             },
 
             {
-                test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                test: /\.(png|svg|jpg|tga|babylon|jpeg|gif)$/i,
                 type: 'asset/resource'
              }
         ],
     },
     plugins: [
+        new CopyPlugin({
+            patterns: [
+                { from: "src/assets/environment", to: "assets/environment",  },
+                { from: "src/assets/skybox", to: "assets/skybox",  },
+                { from: "src/assets/player", to: "assets/player",  },
+
+
+            ],
+        }),
         new HtmlWebpackPlugin({
             inject: true,
             template: path.resolve(appDirectory, "public/index.html"),
