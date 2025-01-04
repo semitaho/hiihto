@@ -66,6 +66,8 @@ class App {
       }
     });
 
+    // hide/show the Inspector
+
     const points = track.getWaypointPoints();
     var currentIndex = 1;
     player.setLocation(
@@ -82,15 +84,34 @@ class App {
     const terrain = new HiihtoTerrain(this._scene);
     terrain.update(track);
 
-    //this.drawDebugWaypoints(scene,points);
+    let speed = 0;
+
+    const kitkakerroin = 0.1; // Define the variable with an appropriate value
+    const speedLimit = 0.5; // Define the variable with an appropriate value
+    const speedInc = 0.05; // Define the variable with an appropriate value
+    window.addEventListener("keyup", (ev) => {
+      ev.preventDefault();
+      if (ev.code === "Space") {
+        speed += speedInc;
+        if (speed > speedLimit) {
+          speed = speedLimit;
+        }
+        console.log("Space key pressed");
+      }
+    });
+    this.drawDebugWaypoints(this.scene, points);
+
+    
+    const distanceToNextWaypoint = 1;
     this.scene.registerBeforeRender(() => {
       if (currentIndex < points.length - 1) {
         const deltaTimeMs = this._engine.getDeltaTime() / 1000;
         const nextLoc = points[currentIndex + 1];
-        const speed = deltaTimeMs * 10;
-        const rotSpeed = deltaTimeMs * 60;
+        //const speed = deltaTimeMs * 5; // 5 units per second
+        const rotSpeed = deltaTimeMs * 10; // 100 degrees per second
         const dist = Vector3.Distance(nextLoc, player.currentLoc);
-        if (dist < 1) {
+        console.log('dist', dist);
+        if (dist  < distanceToNextWaypoint) {
           currentIndex += 1;
           if (currentIndex + 1 >= points.length) {
             currentIndex = 0;
@@ -98,16 +119,23 @@ class App {
         }
         player.lookAtDirection(nextLoc, rotSpeed);
         player.moveTo(speed);
+        speed -= deltaTimeMs * kitkakerroin;
+        if (speed < 0) {
+          speed = 0;
+        }
+      
       }
     });
-
+     
     // run the main render loop
     this._engine.runRenderLoop(() => {
       this.scene.render();
     });
+ 
   }
+
   drawDebugWaypoints(scene: Scene, points: Vector3[]) {
-    const size = 0.6;
+    const size = 1;
 
     const material = new StandardMaterial("waypointMat", scene);
     material.diffuseColor = Color3.Red();
@@ -119,6 +147,7 @@ class App {
       );
       waypoint.position = position;
       waypoint.material = material;
+      waypoint.renderingGroupId = 2; // Set the rendering group for visibility control
     });
   }
 

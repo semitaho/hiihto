@@ -209,8 +209,15 @@ export class HiihtoTrack {
     return texture;
   }
 
+  /**
+   * Retrieves an array of waypoint points from the spline.
+   * The waypoints are selected at every nth point, where n is 150.
+   * Each selected point is adjusted by adding 0.3 to its y-coordinate.
+   *
+   * @returns {Vector3[]} An array of Vector3 objects representing the waypoint points.
+   */
   getWaypointPoints(): Vector3[] {
-    const nth = 150;
+    const nth = 350;
     return this.spline
       .getPoints()
       .filter((_, index) => index % nth === nth - 1)

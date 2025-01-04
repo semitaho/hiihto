@@ -1,5 +1,6 @@
 import {
   Axis,
+  Bone,
   Matrix,
   Mesh,
   MeshBuilder,
@@ -18,6 +19,7 @@ export class PlayerModel {
   private _mesh: Mesh;
   private _skeleton: Skeleton;
 
+  private readonly humanIndex = 1;
   private readonly spineIndex = 3;
   private readonly headIndex = 5;
 
@@ -26,8 +28,11 @@ export class PlayerModel {
 
   private readonly rightHandIndex = 13;
   private readonly rightWristIndex = 15;
-
+  private readonly leftjalkajuuriIndex = 54;
+  private readonly leftPolviIndex = 55;
   private readonly leftFootIndex = 57;
+  private readonly rightjalkajuuriIndex = 50;
+  private readonly rightPolviIndex = 51;
   private readonly rightFootIndex = 53;
 
   private _transformNode: TransformNode;
@@ -93,40 +98,165 @@ export class PlayerModel {
     );
 
     const removableAnimeIndices = [
-      1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-      23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34, 35, 36, 37, 38, 39, 42, 43,
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      42,
+      43,
       44,
+      this.rightPolviIndex,
+      this.leftPolviIndex,
+      this.rightPolviIndex + 1,
+      this.leftPolviIndex + 1,
     ];
 
-    let indices = [this.spineIndex];
-    indices.forEach((index) => {
-      skeleton.bones[index].rotate(Axis.Z, Math.PI / 3);
-    });
-
-    skeleton.bones[this.headIndex].rotate(Axis.Z, -Math.PI / 3);
-
+    this.rotateBone(this.spineIndex, Axis.Z, Math.PI / 15);
+    this.rotateBone(this.headIndex, Axis.Z, -Math.PI / 5);
+    this.rotateBone(this.humanIndex, Axis.Y, Math.PI / 5);
+    this.adjustHandAnimation(this.leftHandIndex);
+    this.adjustHandAnimation(this.rightHandIndex);
     removableAnimeIndices.forEach((index) => {
       skeleton.bones[index].animations = [];
     });
-    this.adjustHandAnimation(this.leftHandIndex);
-    this.adjustHandAnimation(this.rightHandIndex);
-    this._scene.beginAnimation(skeleton, 0, 100, true, 1.5);
+    
+    const jalkajuuriamountChange = Math.PI / 10;
+    const jalkajuuriAnimatioScaleRation = 1.4;
+    this.adjustAnimationRotation(this.leftjalkajuuriIndex, (rotation) => {
+      rotation.x -= jalkajuuriamountChange;
+      rotation.y = Math.PI;
+      rotation.z *= jalkajuuriAnimatioScaleRation;
+    });
+    this.adjustAnimationRotation(this.rightjalkajuuriIndex, (rotation) => {
+      rotation.x += jalkajuuriamountChange;
+      rotation.y = Math.PI;
+      rotation.z *= jalkajuuriAnimatioScaleRation;
+    });
+
+
+    /*
+    animatable.onAnimationEnd = () => {
+      console.log('konna');
+
+      setTimeout(() => {
+        console.log('konna');
+        const animatable2 = this._scene.beginAnimation(skeleton, keyframeLength+1, keyframeLength*2, false, 1.5);
+       
+      }, 2000);
+    };
+    */
   }
 
+  public playVuorohiihto(): void {
+    const keyframeLength = this.getKeyframeLength(this._skeleton);
+    const half = keyframeLength / 2 + 15;
+    const timeout = 300;
+    const animatable = this._scene.beginAnimation(
+      this._skeleton,
+      0,
+      half,
+      false,
+      1.5
+    );
+
+   
+    
+    animatable.onAnimationEnd = () => {
+      setTimeout(() => {
+        const anim2 = this._scene.beginAnimation(
+          this._skeleton,
+           half +1 ,
+          keyframeLength * 2,
+          false,
+          1.5
+        );
+        anim2.onAnimationEnd = () => {
+          setTimeout(() => {
+            this.playVuorohiihto();
+          }, timeout);
+        };
+      }, timeout);
+    };
+    
+  }
+
+  private getKeyframeLength(skeleton: Skeleton): number {
+    const bones = skeleton.bones;
+    let keyframeMax = 0;
+    bones.forEach((bone) => {
+      bone.animations.forEach((animation) => {
+        keyframeMax = Math.max(keyframeMax, animation.getKeys().length);
+      });
+    });
+    return keyframeMax;
+  }
+
+  rotateBone(boneIndex: number, rotateAxis: Vector3, amount: number): void {
+    this._skeleton.bones[boneIndex].rotate(rotateAxis, amount);
+  }
+
+  /**
+   * Adjusts the hand animation by modifying the rotation angles.
+   * @param handIndex - The index of the hand bone in the skeleton.
+   */
   adjustHandAnimation(handIndex: number): void {
-    const animation = this._skeleton.bones[handIndex].animations[0];
+
+    this.adjustAnimationRotation(handIndex, (rotationAngles) => {
+      rotationAngles.x +=  handIndex == this.rightHandIndex ? 0.3 : -0.3;
+      rotationAngles.z *= 2.6;
+    });
+  }
+
+  adjustAnimationRotation(
+    animationIndex: number,
+    fn: (
+      rotation: Vector3,
+      keyframeLength: number,
+      currentKeyframeIndex: number
+    ) => void
+  ): void {
+    const animation = this._skeleton.bones[animationIndex].animations[0];
     const keyFrames = animation.getKeys();
     keyFrames.forEach((frame, index) => {
       const matrix = frame.value as Matrix;
       const scale = new Vector3();
       const rotation = new Quaternion();
       const translation = new Vector3();
-
       matrix.decompose(scale, rotation, translation);
       const rotationAngles = rotation.toEulerAngles();
-      rotationAngles.z -= 0.1;
-      rotationAngles.z *= 2.6;
-
+      fn(rotationAngles, keyFrames.length, index);
       const newRotation = Quaternion.FromEulerAngles(
         rotationAngles.x,
         rotationAngles.y,
@@ -139,22 +269,25 @@ export class PlayerModel {
   }
 
   lookAtDirection(targetPosition: Vector3, rotationSpeed: number): void {
+  
     const targetDirection = targetPosition
       .subtract(this.currentLoc)
       .normalize();
-
+  
     const targetRotationQuaternion = Quaternion.FromLookDirectionRH(
       targetDirection,
       this._transformNode.up
     );
-    // targetRotationQuaternion.z = 0;
-    this._transformNode.rotationQuaternion = targetRotationQuaternion;
 
-    Quaternion.SlerpToRef(
-      this.currentRot || Quaternion.Identity(),
+    targetRotationQuaternion.x = 0;
+    //targetRotationQuaternion.z = 0;
+    this._transformNode.rotationQuaternion = this.currentRot;
+    this._transformNode.rotationQuaternion.x = 0;
+
+    this._transformNode.rotationQuaternion = Quaternion.Slerp(
+      this._transformNode.rotationQuaternion,
       targetRotationQuaternion,
-      rotationSpeed,
-      this._transformNode.rotationQuaternion
+      rotationSpeed
     );
 
     /*
@@ -184,6 +317,7 @@ export class PlayerModel {
       Vector3.Forward(),
       this._transformNode.getWorldMatrix()
     );
+    
   }
 
   moveTo(speed: number) {
@@ -203,7 +337,10 @@ export class PlayerModel {
   }
 
   get currentRot(): Quaternion {
-    return this._transformNode.rotationQuaternion;
+    if (this._transformNode.rotationQuaternion) {
+      return this._transformNode.rotationQuaternion;
+    }
+    return Quaternion.Identity();
   }
 
   set currentRot(rotation: Quaternion) {
